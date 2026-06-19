@@ -1,0 +1,10 @@
+{
+  "name": "cloud-music-backend",
+  "version": "1.0.0",
+  "description": "Cloud Music Service Backend",
+  "main": "server.js",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
