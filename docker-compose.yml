@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  cloud-music:
+    image: ghcr.io/liucent/cloud-music:latest # 这里可以改成你的镜像名
+    container_name: cloud-music-app
+    restart: always
+    ports:
+      - "8080:3000"
+    user: "0:0" # 强制容器使用 root 账户运行，确保能无障碍读写本地 root 权限挂载的目录
+    environment:
+      - ACCESS_PASSWORD=my_secure_password_2026   # 访问密码配置
+      - MUSIC_SOURCES=netease,tidal,tencent       # 允许的音乐源列表 (用逗号隔开)
+      - PORT=3000
+    volumes:
+      # 将宿主机的路径 ./local_data 挂载到容器内部的播放列表存储路径
+      # 即使重新部署容器，原有的播放列表文件也会安全保存在宿主机本地
+      - ./local_data:/app/backend/data

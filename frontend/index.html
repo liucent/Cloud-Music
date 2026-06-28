@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Cloud Music</title>
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='4' y='4' width='56' height='56' rx='14' fill='%23262626'/%3E%3Crect x='4' y='4' width='56' height='56' rx='14' fill='rgba(255,255,255,0.04)'/%3E%3Cpath fill='%23e5e5e5' d='M42 18v24.5c0 5-3.8 8.5-9.2 8.5-4.7 0-8.3-2.8-8.3-7.1 0-4.2 3.5-7 8.4-7 1.3 0 2.4.2 3.4.6V23.5l13-2.5V18z'/%3E%3C/svg%3E">
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="ambient-bg" id="ambientBg"></div>
+
+<div class="apple-alert-mask" id="appleAlertMask">
+    <div class="apple-alert-box">
+        <div class="apple-alert-content">
+            <div class="apple-alert-title" id="appleAlertTitle"></div>
+            <div class="apple-alert-msg" id="appleAlertMsg"></div>
+        </div>
+    </div>
+</div>
+
+<div class="auth-overlay" id="authOverlay">
+    <div class="auth-card">
+        <h2>输入 Cloud Music 访问密码</h2>
+        <input type="password" id="passwordInput" placeholder="请输入密码" onkeydown="if(event.key==='Enter') AppStore.validateCredentials()">
+        <button onclick="AppStore.validateCredentials()">验证登录</button>
+    </div>
+</div>
+
+<div class="main-stage" id="mainStage">
+    <div class="display-container">
+        <div class="artwork-view" id="artworkView">
+            <div class="player-deck" id="playerDeck">
+                <svg class="player-stylus" id="playerStylus" viewBox="0 0 30 80">
+                    <circle cx="15" cy="15" r="7" fill="#555"/>
+                    <path d="M15 15 L13 55 L22 72 L21 78" fill="none" stroke="#bbb" stroke-width="2.5" stroke-linecap="round"/>
+                    <rect x="16" y="68" width="8" height="10" rx="1" fill="#333"/>
+                </svg>
+                <div class="vinyl-body">
+                    <div class="inner-cover-viewport" id="vinylCoreClickZone" onclick="AppStore.switchDisplayMode('lyrics')">
+                        <div class="vinyl-slide-wrapper slide-active" id="currentSlideWrapper">
+                            <img referrerpolicy="no-referrer" src="" alt="" class="artwork-img" id="currentCover">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="track-meta">
+                <div class="track-title" id="currentTitle">Cloud Music</div>
+                <div class="track-artist" id="currentArtist">检索并添加音轨</div>
+                <div class="meta-quality-container">
+                    <div class="wide-quality-badge">
+                        <span id="badgeQualityText">SQ 无损</span>
+                        <select class="narrow-touch-select" id="stageQualitySelector" onchange="AppStore.mutateQualitySetting(this.value)">
+                            <option value="flac">SQ 无损</option>
+                            <option value="320">HQ 320K</option>
+                            <option value="192">LQ 192K</option>
+                            <option value="128">LQ 128K</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lyric-view" id="lyricView" onclick="AppStore.switchDisplayMode('artwork')">
+            <div class="cm-lyrics-container" id="lyricsBlock"></div>
+        </div>
+    </div>
+
+    <div class="control-dashboard">
+        <div class="scrubber-box">
+            <div class="scrubber-track-wrapper" id="scrubberTrack" onclick="AppStore.handleScrubberInteraction(event)">
+                <div class="scrubber-fill" id="scrubberFill"></div>
+                <div class="scrubber-handle" id="scrubberHandle"></div>
+            </div>
+            <div class="time-stamps">
+                <span id="timeCurrent">0:00</span>
+                <span id="timeDuration">-0:00</span>
+            </div>
+        </div>
+        <div class="dock-buttons">
+            <button class="symbol-btn" onclick="AppStore.togglePlayMode()" id="playModeBtn"></button>
+            <button class="symbol-btn" onclick="AppStore.skipTrack(-1)">
+                <svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M19 20L9 12l10-8v16zM5 19V5"/></svg>
+            </button>
+            <button class="symbol-btn play-pause" onclick="AppStore.togglePlayback()">
+                <svg id="playPauseIcon" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>
+            </button>
+            <button class="symbol-btn" onclick="AppStore.skipTrack(1)">
+                <svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M5 4l10 8-10 8V4zM19 5v14"/></svg>
+            </button>
+            <button class="symbol-btn" onclick="AppStore.openSheet('search')">
+                <svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="sheet-backdrop-mask" id="sheetBackdropMask" onclick="AppStore.closeSheet()"></div>
+
+<div class="bottom-sheet" id="unifiedBottomSheet">
+    <div class="sheet-handle-bar" onclick="AppStore.closeSheet()"></div>
+    <div class="sheet-nav">
+        <span class="sheet-tab" id="tabSearch" onclick="AppStore.switchSheetTab('search')">搜索音乐</span>
+        <span class="sheet-tab" id="tabLibrary" onclick="AppStore.switchSheetTab('library')">播放列表</span>
+    </div>
+    <div class="sheet-body" id="sheetBodyContent"></div>
+</div>
+
+<audio id="coreAudioEngine" autoplay></audio>
+
+<script src="js/app.js"></script>
+</body>
+</html>
