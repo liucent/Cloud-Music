@@ -1,0 +1,13 @@
+{
+  "name": "cloud-music-backend",
+  "version": "1.0.0",
+  "description": "Cloud Music Backend with Express 5 & SQLite",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.11.1",
+    "express": "^5.2.1"
+  }
+}
